@@ -78,7 +78,7 @@ func (m *MicroCache) processExpiration() {
 }
 
 // Get entry from the cache by "key" if present, otherwise it returns ErrKeyNotFound error.
-func (m *MicroCache) Get(_ context.Context, key string) (any, error) {
+func (m *MicroCache) Get(key string) (any, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
@@ -90,7 +90,7 @@ func (m *MicroCache) Get(_ context.Context, key string) (any, error) {
 }
 
 // Set the entry to cache, "expiration" interval determines how long the entry will remain in the cache.
-func (m *MicroCache) Set(_ context.Context, key string, value any, expiration time.Duration) error {
+func (m *MicroCache) Set(key string, value any, expiration time.Duration) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
