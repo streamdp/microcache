@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// defaultCheckInterval sets the default value of memory checks for expired entries.
 const defaultCheckInterval = 10 * time.Second
 
 var errKeyNotFound = errors.New("key is missing in the cache")
@@ -17,6 +18,12 @@ type record struct {
 	expiredAt time.Time
 }
 
+// MicroCache provides cache interface implementation.
+//
+//	type Cache interface {
+//	    Get(ctx context.Context, key string) (any, error)
+//	    Set(ctx context.Context, key string, value any, expiration time.Duration) error
+//	}
 type MicroCache struct {
 	ctx context.Context
 
@@ -26,6 +33,8 @@ type MicroCache struct {
 	checkInterval time.Duration
 }
 
+// New create a new one micro cache instance, parameter "checkInterval" sets how often check memory map for the
+// expired entries.
 func New(ctx context.Context, checkInterval *time.Duration) *MicroCache {
 	c := &MicroCache{
 		ctx: ctx,
@@ -68,6 +77,7 @@ func (m *MicroCache) processExpiration() {
 	}
 }
 
+// Get entry from the cache by "key" if present, otherwise it returns errKeyNotFound error.
 func (m *MicroCache) Get(_ context.Context, key string) (any, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -79,6 +89,7 @@ func (m *MicroCache) Get(_ context.Context, key string) (any, error) {
 	return nil, errKeyNotFound
 }
 
+// Set the entry to cache, "expiration" interval determines how long the entry will remain in the cache.
 func (m *MicroCache) Set(_ context.Context, key string, value any, expiration time.Duration) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
