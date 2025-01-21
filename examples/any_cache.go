@@ -38,8 +38,12 @@ func (a *AnyCache) Get(key string) (result any, err error) {
 }
 
 func main() {
-	c := NewAnyCache(microcache.New(context.Background(), nil))
+	c := NewAnyCache(microcache.New(context.Background(), -1))
 	_ = c.Set("key1", "val1")
 
-	fmt.Println(c.Get("key1"))
+	v, err := c.Get("key1")
+	if err != nil {
+		fmt.Println("key not found")
+	}
+	fmt.Println(v)
 }

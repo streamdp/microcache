@@ -32,8 +32,14 @@ type MicroCache struct {
 	checkInterval time.Duration
 }
 
-// New create a new one micro cache instance, parameter "checkInterval" sets how often (in milliseconds) check memory
+// New create a new one micro cache instance, "checkInterval" sets how often (in milliseconds) check memory
 // map for the expired entries. Set "checkInterval" = 0 or -1 to use default value.
+//
+//	// check for expired entries every minutes
+//	cache := microcache.New(context.Background(), 60000);
+//
+//	// set check interval to the default value (30 seconds)
+//	cache := microcache.New(context.Background(), -1);
 func New(ctx context.Context, checkInterval int) *MicroCache {
 	c := &MicroCache{
 		ctx: ctx,
@@ -96,6 +102,18 @@ func (m *MicroCache) getExpired() (expired map[string]struct{}, ok bool) {
 }
 
 // Get entry from the cache by "key" if present, otherwise it returns ErrKeyNotFound error.
+//
+// Example:
+//
+//	func main() {
+//		...
+//		v, err := cache.Get("key1");
+//		if err != nil {
+//			fmt.Println("key not found")
+//		}
+//		fmt.Println("v=", v)
+//		...
+//	}
 func (m *MicroCache) Get(key string) (any, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -108,6 +126,15 @@ func (m *MicroCache) Get(key string) (any, error) {
 }
 
 // Set the entry to cache, "expiration" interval determines how long the entry will remain in the cache.
+//
+// Example:
+//
+//	func main() {
+//		var val1 = map[string]int{"temp": 101}
+//		cache := microcache.New(context.Background(), -1)
+//		_ = cache.Set("key1", val1, 60*time.Second)
+//		...
+//	}
 func (m *MicroCache) Set(key string, value any, expiration time.Duration) error {
 	m.mu.Lock()
 	m.c[key] = &record{

@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	cache := microcache.New(context.Background(), nil)
+	cache := microcache.New(context.Background(), -1)
 	_ = cache.Set("key1", "val1", time.Hour)
 
 	fmt.Println(cache.Get("key1"))
