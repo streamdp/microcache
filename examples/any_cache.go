@@ -38,7 +38,7 @@ func (a *AnyCache) Get(key string) (result any, err error) {
 }
 
 func main() {
-	c := NewAnyCache(microcache.New(context.Background(), -1))
+	c := NewAnyCache(microcache.New(context.Background(), 0))
 	_ = c.Set("key1", "val1")
 
 	v, err := c.Get("key1")

@@ -33,12 +33,15 @@ type MicroCache struct {
 }
 
 // New create a new one micro cache instance, "checkInterval" sets how often (in milliseconds) check memory
-// map for the expired entries. Set "checkInterval" = 0 or -1 to use default value.
+// map for the expired entries. Set "checkInterval" = 0 to use default value or -1 to disable expiration check.
 //
 //	// check for expired entries every minutes
 //	cache := microcache.New(context.Background(), 60000);
 //
 //	// set check interval to the default value (30 seconds)
+//	cache := microcache.New(context.Background(), 0);
+//
+//	// disable expiration check
 //	cache := microcache.New(context.Background(), -1);
 func New(ctx context.Context, checkInterval int) *MicroCache {
 	c := &MicroCache{
@@ -54,7 +57,9 @@ func New(ctx context.Context, checkInterval int) *MicroCache {
 		c.checkInterval = time.Duration(checkInterval) * time.Millisecond
 	}
 
-	go c.processExpiration()
+	if checkInterval != -1 {
+		go c.processExpiration()
+	}
 
 	return c
 }
