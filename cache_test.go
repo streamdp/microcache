@@ -123,3 +123,49 @@ func TestMicroCache_Get(t *testing.T) {
 		})
 	}
 }
+
+func TestMicroCache_Delete(t *testing.T) {
+	entryExpireTime := int(time.Now().Add(time.Minute).UnixMilli())
+
+	tests := []struct {
+		name  string
+		cache map[string]*record
+		key   string
+		want  any
+	}{
+		{
+			name: "delete key from cache",
+			cache: map[string]*record{
+				"key1": {
+					value:     "val1",
+					expiredAt: entryExpireTime,
+				},
+				"key2": {
+					value:     "val2",
+					expiredAt: entryExpireTime,
+				},
+			},
+			key: "key2",
+			want: map[string]*record{
+				"key1": {
+					value:     "val1",
+					expiredAt: entryExpireTime,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := &MicroCache{
+				ctx:           context.Background(),
+				c:             tt.cache,
+				mu:            &sync.RWMutex{},
+				checkInterval: time.Hour,
+			}
+			m.Delete(tt.key)
+			if !reflect.DeepEqual(m.c, tt.want) {
+				t.Errorf("Get() got = %v, want %v", m.c, tt.want)
+			}
+		})
+	}
+}

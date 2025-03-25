@@ -124,3 +124,10 @@ func (m *MicroCache) Set(key string, value any, expiration time.Duration) error 
 
 	return nil
 }
+
+// Delete the entry from cache immediately.
+func (m *MicroCache) Delete(key string) {
+	m.mu.Lock()
+	delete(m.c, key)
+	m.mu.Unlock()
+}
